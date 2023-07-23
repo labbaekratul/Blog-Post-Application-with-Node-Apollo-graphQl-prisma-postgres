@@ -1,0 +1,56 @@
+scalar Date
+
+type Query {
+  getUsers: [User!]!
+  getUser(id: ID!): User!
+}
+
+type Mutation {
+  siginupUser(input: UserSignupInput!): User_Signin_Signup_ReturnType!
+  sigininUser(input: UserSigninInput!): User_Signin_Signup_ReturnType!
+  updateUser(id: ID!, updateInput: UserUpdateInput!): User!
+  deleteUser(id: ID!): UserDeleteType!
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  image: String
+  role: Role!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type User_Signin_Signup_ReturnType {
+  id: ID!
+  username: String!
+  token: String
+}
+
+type UserDeleteType {
+  message: String!
+}
+
+input UserSignupInput {
+  username: String! @constraint(minLength: 2, maxLength: 5)
+  email: String! @constraint(format: "email", maxLength: 5)
+  password: String!
+  image: String
+}
+
+input UserSigninInput {
+  email: String!
+  password: String!
+}
+
+input UserUpdateInput {
+  username: String
+  email: String
+  image: String
+}
+
+enum Role {
+  ADMIN
+  USER
+}
