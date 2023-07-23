@@ -6,7 +6,9 @@
   "scripts": {
     "start:dev": "nodemon src/server.ts",
     "start:prod": "node dist/server.js",
-    "build": "rimraf ./dist && tsc && xcopy /s src\\*.graphql dist"
+    "build": "rimraf ./dist && tsc && xcopy /s src\\*.graphql dist",
+    "start:db": "docker-compose up -d",
+    "stop:db": "docker-compose down"
   },
   "keywords": [],
   "author": "",
