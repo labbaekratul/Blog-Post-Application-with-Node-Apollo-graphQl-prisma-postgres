@@ -5,3 +5,9 @@ export interface CustomError {
     cause: string;
   };
 }
+
+export interface tokenParams {
+  id: string;
+  username: string;
+  role: string;
+}

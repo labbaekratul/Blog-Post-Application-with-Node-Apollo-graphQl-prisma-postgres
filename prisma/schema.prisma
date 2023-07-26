@@ -8,17 +8,61 @@ datasource db {
 }
 
 model User {
+  id        String    @id @default(uuid())
+  name      String    @map("trim(name)") @db.VarChar(30)
+  email     String    @unique @map("trim(email)") @db.VarChar(30)
+  password  String    @map("trim(password)") @db.VarChar(25)
+  role      Role      @default(USER)
+  image     Json?     @db.Json
+  posts     Post[]
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([name, email])
+  @@index([email, updatedAt(sort: Desc)])
+  @@map("users")
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  title     String    @map("trim(title)") @db.VarChar(100)
+  content   String    @map("trim(content)") @db.VarChar(500)
+  status    Status    @default(PUBLISHED)
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([authorId, updatedAt(sort: Desc)])
+  @@map("posts")
+}
+
+model Comment {
   id        String   @id @default(uuid())
-  username  String   @map("trim(name)") @db.VarChar(30)
-  email     String   @unique @map("trim(email)") @db.VarChar(35)
-  password  String   @map("trim(password)") @db.VarChar(255)
-  role      Role     @default(USER)
-  image     String?
+  content   String   @map("trim(content)") @db.VarChar(500)
+  status    Status   @default(PUBLISHED)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([authorId, postId, updatedAt(sort: Desc)])
+  @@map("comments")
 }
 
 enum Role {
   ADMIN
   USER
+}
+
+enum Status {
+  PUBLISHED
+  HOLD
+  PENDING
+  REMOVED
+  CANCELED
 }

@@ -7,22 +7,21 @@ import { Prisma } from "utils/db";
 import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/jwt.stratagy";
 import { customError } from "../../utils/error";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 // ## SIGNUP NEW USER
 export const siginupUser = async (args: userSignupInput, db: Prisma) => {
+  const { name, email, password, image } = args;
   try {
-    const { username, email, password, image } = args;
     const hashPassword = bcrypt.hashSync(password, 10);
     const newUser = await db.user.create({
-      data: { username, email, password: hashPassword, image },
+      data: { name, email, password: hashPassword, image },
     });
-    const token = generateToken({ id: newUser.id, username: newUser.username });
-    return {
+    const token = generateToken({
       id: newUser.id,
-      username: newUser.username,
-      token,
-    };
+      username: newUser.name,
+      role: newUser.role,
+    });
+    return { token };
   } catch (error: any) {
     customError(error);
   }
@@ -37,12 +36,12 @@ export const sigininUser = async (args: userSigninInput, db: Prisma) => {
     return customError(error);
   }
   if (bcrypt.compareSync(password, user.password)) {
-    const token = generateToken({ id: user.id, username: user.username });
-    return {
+    const token = generateToken({
       id: user.id,
-      username: user.username,
-      token,
-    };
+      username: user.name,
+      role: user.role,
+    });
+    return { token };
   }
   return customError(error);
 };
@@ -66,11 +65,11 @@ export const updateUser = async (
   updateInput: userUpdateInput,
   db: Prisma
 ) => {
-  const { username, email, image } = updateInput;
+  const { name, email, image } = updateInput;
   try {
     return await db.user.update({
       where: { id },
-      data: { username, email, image },
+      data: { name, email, image },
     });
   } catch (error: any) {
     customError(error);
@@ -81,7 +80,7 @@ export const updateUser = async (
 export const deleteUser = async (id: string, db: Prisma) => {
   try {
     const deleteUser = await await db.user.delete({ where: { id } });
-    return { message: `User ${deleteUser.username} is removed from this list` };
+    return { message: `User ${deleteUser.name} is removed from this list` };
   } catch (error: any) {
     customError(error);
   }

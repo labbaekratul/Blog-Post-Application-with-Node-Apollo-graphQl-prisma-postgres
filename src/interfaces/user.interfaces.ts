@@ -1,14 +1,12 @@
-import { Role } from "@prisma/client";
-
 export interface userSignupInput {
-  username: string;
+  name: string;
   email: string;
   password: string;
   image?: string;
 }
 
 export interface userUpdateInput {
-  username?: string;
+  name?: string;
   email?: string;
   image?: string;
 }
